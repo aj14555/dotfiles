@@ -65,10 +65,6 @@ child:selected {
   background: alpha(@selected-text, 0.15);
 }
 
-child:selected .item-box * {
-  color: @selected-text;
-}
-
 .item-box {
   padding: 0 12px;
 }
@@ -79,7 +75,7 @@ child:selected .item-box * {
 }
 
 .item-text {
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .item-subtext {

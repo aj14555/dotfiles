@@ -89,7 +89,7 @@ window#waybar {
 /* ── Media player ────────────────────────────────────────────────────────── */
 #mpris {
   padding: 0 4px;
-  opacity: 0.9;
+  opacity: 1;
   font-size: 14px;
   font-weight: 600;
 }
@@ -148,7 +148,7 @@ window#waybar {
 
 /* ── Connectivity + system icons ─────────────────────────────────────────── */
 #bluetooth {
-  margin: 0 10px;
+  margin: 0 5px;
 }
 
 #network {
@@ -209,7 +209,7 @@ menu,
   border: 1px solid alpha(@foreground, 0.13);
   padding: 4px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.40);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 menuitem {
@@ -217,7 +217,7 @@ menuitem {
   color: @foreground;
   min-height: 0;
   transition: background-color 120ms ease;
-  
+  font-weight: 400;
 }
 
 menuitem:hover,
@@ -255,4 +255,3 @@ separator {
   padding: 0;
   margin: 0;
 }
-

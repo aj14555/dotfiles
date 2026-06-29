@@ -10,8 +10,7 @@
 
   "modules-left": [
     "custom/omarchy",
-    "hyprland/workspaces",
-    "clock"
+    "hyprland/workspaces"
   ],
   "modules-center": [
     "mpris"
@@ -27,7 +26,8 @@
     "network",
     "pulseaudio",
     "cpu",
-    "battery"
+    "battery",
+    "clock"
   ],
 
   // ── Left ──────────────────────────────────────────────────────────────────
@@ -73,31 +73,17 @@
   // ── Center ────────────────────────────────────────────────────────────────
 
   "mpris": {
-    "format": "{player_icon}   {dynamic}",
-    "format-paused": "{player_icon}  {dynamic}",
-    "format-stopped": "",
-    "interval": 1,
+    "format": "{player_icon}  {dynamic}",
+    "format-playing": "{player_icon}  {dynamic}",
+    "format-paused": "{status_icon}  {dynamic}",
+    "dynamic-order": ["title", "artist"],
     "player-icons": {
-      "default": "▶",
-      "spotify": "",
-      "firefox": "󰈹",
-      "chromium": "",
-      "mpv": "󰎈",
-      "vlc": "󰕼"
+        "default": "",
+        "mpv": "🎵"
     },
     "status-icons": {
-      "paused": "⏸",
-      "playing": "▶",
-      "stopped": "⏹"
-    },
-    "dynamic-len": 40,
-    "dynamic-importance-order": ["title", "artist", "album"],
-    "on-click": "playerctl play-pause",
-    "on-click-right": "playerctl next",
-    "on-click-middle": "playerctl previous",
-    "on-scroll-up": "playerctl volume 0.05+",
-    "on-scroll-down": "playerctl volume 0.05-",
-    "tooltip-format": "{player}\n{title}\n{artist}"
+        "paused": ""
+    }
   },
 
   // ── Right ─────────────────────────────────────────────────────────────────
@@ -161,7 +147,7 @@
     "spacing": 14
   },
   "bluetooth": {
-    "format": "",
+    "format": "󰂯",
     "format-off": "󰂲",
     "format-disabled": "󰂲",
     "format-connected": "󰂱",
@@ -170,11 +156,11 @@
     "on-click": "omarchy-launch-bluetooth"
   },
   "network": {
-    "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+    "format-icons": [""],
     "format": "{icon}",
     "format-wifi": "{icon}",
     "format-ethernet": "󰀂",
-    "format-disconnected": "󰤮",
+    "format-disconnected": "󰖪",
     "tooltip-format-wifi": "{essid} ({frequency} GHz)",
     "tooltip-format-ethernet": "Connected",
     "tooltip-format-disconnected": "Disconnected",
@@ -197,7 +183,7 @@
   },
   "cpu": {
     "interval": 5,
-    "format": "󰍛",
+    "format": "",
     "on-click": "omarchy-launch-or-focus-tui btop",
     "on-click-right": "alacritty"
   },
