@@ -1,75 +1,115 @@
 @import "../omarchy/current/theme/waybar.css";
 
+/* ── Reset ───────────────────────────────────────────────────────────────── */
 * {
-  background-color: @background;
-  color: @foreground;
-
   border: none;
   border-radius: 0;
   min-height: 0;
-  font-family: 'CaskaydiaMono Nerd Font';
-  font-size: 15px;
+  /* Inter for text, Nerd Font as fallback for icon glyphs */
+  font-family: 'Inter Variable', 'CaskaydiaMono Nerd Font', sans-serif;
+  font-size: 14px;
+  color: @foreground;
+  background: transparent;
+  font-weight: 500;
+}
+
+/* ── Bar window: single unified pill ─────────────────────────────────────── */
+window#waybar {
+  background: alpha(@background, 0.60);
+  border-radius: 12px;
+  color: @foreground;
 }
 
 .modules-left {
-  margin-left: 8px;
+  padding: 0 6px;
+}
+
+.modules-center {
+  padding: 0 14px;
 }
 
 .modules-right {
-  margin-right: 8px;
+  padding: 0 6px;
+}
+
+/* ── Omarchy launcher ────────────────────────────────────────────────────── */
+#custom-omarchy {
+  min-width: 12px;
+  margin: 0 4px 0 2px;
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+#custom-omarchy:hover {
+  opacity: 1;
+}
+
+/* ── Workspaces ──────────────────────────────────────────────────────────── */
+#workspaces {
+  padding: 0 2px;
 }
 
 #workspaces button {
   all: initial;
+  font-family: 'CaskaydiaMono Nerd Font';
+  font-size: 13px;
+  color: @foreground;
+  border-radius: 8px;
   padding: 0 6px;
-  margin: 0 1.5px;
+  margin: 0 1px;
   min-width: 9px;
+  opacity: 0.45;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+
+#workspaces button.active {
+  opacity: 1;
 }
 
 #workspaces button.empty {
-  opacity: 0.5;
+  opacity: 0.2;
 }
 
-#cpu,
-#battery,
-#pulseaudio,
-#custom-omarchy,
-#custom-update {
-  min-width: 12px;
-  margin: 0 7.5px;
+#workspaces button:hover {
+  opacity: 0.8;
 }
 
-#tray {
-  margin-right: 16px;
-}
-
-#bluetooth {
-  margin-right: 17px;
-}
-
-#network {
-  margin-right: 13px;
-}
-
-#custom-expand-icon {
-  margin-right: 18px;
-}
-
-tooltip {
-  padding: 2px;
-}
-
-#custom-update {
-  font-size: 10px;
-}
-
+/* ── Clock ───────────────────────────────────────────────────────────────── */
 #clock {
-  margin-left: 8.75px;
+  padding-right: 4px;
+  font-weight: bold;
+  font-size: 14px;
 }
 
+/* ── Media player ────────────────────────────────────────────────────────── */
+#mpris {
+  padding: 0 4px;
+  opacity: 0.9;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#mpris.paused {
+  opacity: 0.55;
+}
+
+#mpris.stopped {
+  min-width: 0;
+  padding: 0;
+}
+
+/* ── Uniform icon size across all right-side modules ─────────────────────── */
+.modules-right * {
+  font-size: 16px;
+}
+
+/* ── Right-side status icons ─────────────────────────────────────────────── */
 #custom-weather {
-  margin-left: 7.5px;
-  margin-right: 7.5px;
+  /* thin left rule to visually separate from workspaces */
+  border-left: 1px solid alpha(@foreground, 0.15);
+  margin-left: 6px;
+  padding-left: 10px;
+  margin-right: 14px;
 }
 
 #custom-weather.unavailable {
@@ -78,34 +118,150 @@ tooltip {
   padding: 0;
 }
 
-.hidden {
-  opacity: 0;
+#custom-update {
+  margin: 0 9px;
+}
+
+#custom-voxtype {
+  min-width: 12px;
+  margin: 0 9px;
+}
+
+#custom-voxtype.recording {
+  color: #bf616a;
 }
 
 #custom-screenrecording-indicator,
 #custom-idle-indicator,
 #custom-notification-silencing-indicator {
   min-width: 12px;
-  margin-left: 5px;
-  margin-right: 0;
-  font-size: 10px;
+  margin: 0 7px;
   padding-bottom: 1px;
 }
 
-#custom-screenrecording-indicator.active {
-  color: #a55555;
-}
-
+#custom-screenrecording-indicator.active,
 #custom-idle-indicator.active,
 #custom-notification-silencing-indicator.active {
-  color: #a55555;
+  color: #bf616a;
 }
 
-#custom-voxtype {
+/* ── Tray ────────────────────────────────────────────────────────────────── */
+#custom-expand-icon {
+  margin: 0 10px;
+}
+
+#tray {
+  margin: 0 8px;
+}
+
+/* ── Connectivity + system icons ─────────────────────────────────────────── */
+#bluetooth {
+  margin: 0 10px;
+}
+
+#network {
+  margin: 0 10px;
+}
+
+#pulseaudio {
+  margin: 0 10px;
+}
+
+#cpu {
   min-width: 12px;
-  margin: 0 0 0 7.5px;
+  margin: 0 10px;
 }
 
-#custom-voxtype.recording {
-  color: #a55555;
+#battery {
+  min-width: 12px;
+  margin: 0 6px 0 4px;
 }
+
+#battery.warning {
+  color: #ebcb8b;
+}
+
+#battery.critical {
+  color: #bf616a;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────── */
+tooltip {
+  background: alpha(@background, 0.92);
+  border: 1px solid alpha(@foreground, 0.12);
+  padding: 4px 8px;
+}
+
+tooltip label {
+  color: @foreground;
+}
+
+/* ── Tray icon context menus ─────────────────────────────────────────────── */
+
+/* Strip the outer GTK popup window — transparent so only the rounded menu shows */
+window.popup {
+  background: transparent;
+}
+
+window.popup decoration {
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+menu,
+.menu,
+.context-menu {
+  background: alpha(@background, 0.95);
+  color: @foreground;
+  border: 1px solid alpha(@foreground, 0.13);
+  padding: 4px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.40);
+  font-size: 10px;
+}
+
+menuitem {
+  border-radius: 8px;
+  padding: 5px 12px;
+  color: @foreground;
+  min-height: 0;
+  transition: background-color 120ms ease;
+  font-size: 10px;
+}
+
+menuitem:hover,
+menuitem:focus {
+  background: alpha(@background, 0.95);
+  color: @foreground;
+}
+
+menuitem:disabled {
+  color: alpha(@foreground, 0.35);
+  background-color: transparent;
+}
+
+menuitem image {
+  margin-right: 8px;
+  opacity: 0.85;
+}
+
+menuitem arrow {
+  color: alpha(@foreground, 0.50);
+  min-width: 14px;
+  min-height: 14px;
+}
+
+separator {
+  background-color: alpha(@foreground, 0.13);
+  min-height: 1px;
+  margin: 3px 8px;
+}
+
+/* ── Hidden class (used by omarchy indicators) ───────────────────────────── */
+.hidden {
+  opacity: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+

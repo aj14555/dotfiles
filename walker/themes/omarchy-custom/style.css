@@ -1,0 +1,123 @@
+@import "../../../../.config/omarchy/current/theme/walker.css";
+
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+* {
+  all: unset;
+}
+
+* {
+  font-family: 'Inter Variable', 'CaskaydiaMono Nerd Font', sans-serif;
+  font-size: 15px;
+  color: @text;
+}
+
+scrollbar {
+  opacity: 0;
+}
+
+/* ── Outer container: glassy pill matching waybar ────────────────────────── */
+.box-wrapper {
+  background: alpha(@base, 0.60);
+  border-radius: 16px;
+  border: 1px solid alpha(@border, 0.18);
+  padding: 10px;
+}
+
+/* ── Search bar ──────────────────────────────────────────────────────────── */
+.search-container {
+  background: alpha(@text, 0.06);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+}
+
+.input placeholder {
+  opacity: 0.35;
+}
+
+.input {
+  font-size: 16px;
+  font-weight: 500;
+  caret-color: @selected-text;
+}
+
+.input:focus,
+.input:active {
+  box-shadow: none;
+  outline: none;
+}
+
+/* ── Results list ────────────────────────────────────────────────────────── */
+.content-container {
+  padding: 2px 0;
+}
+
+child {
+  border-radius: 8px;
+  transition: background 100ms ease;
+}
+
+child:hover .item-box {
+  opacity: 0.85;
+}
+
+child:selected {
+  background: alpha(@selected-text, 0.15);
+}
+
+child:selected .item-box * {
+  color: @selected-text;
+}
+
+.item-box {
+  padding: 0 12px;
+}
+
+.item-text-box {
+  all: unset;
+  padding: 10px 0;
+}
+
+.item-text {
+  font-weight: 400;
+}
+
+.item-subtext {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 1px;
+}
+
+.item-image {
+  margin-right: 12px;
+  -gtk-icon-transform: scale(0.88);
+}
+
+/* ── Icons ───────────────────────────────────────────────────────────────── */
+.normal-icons {
+  -gtk-icon-size: 16px;
+}
+
+.large-icons {
+  -gtk-icon-size: 28px;
+}
+
+/* ── Misc ────────────────────────────────────────────────────────────────── */
+.current {
+  font-style: normal;
+  opacity: 0.6;
+}
+
+.placeholder {
+  opacity: 0.35;
+  padding: 20px;
+}
+
+.keybind-hints {
+  background: alpha(@text, 0.04);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.6;
+}

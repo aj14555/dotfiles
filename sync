@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# dots/sync — Sync Omarchy customizations to ~/dotfiles and optionally commit.
+#
+# Usage:
+#   dots              Sync configs, show what changed
+#   dots -c           Sync and commit (auto message)
+#   dots -c 'msg'     Sync and commit with a custom message
+#   dots -p           Sync, commit, and push to origin
+#   dots -s           Show git status only (no sync)
+
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+CONFIG="$HOME/.config"
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'
+RED='\033[0;31m'; BOLD='\033[1m'; RESET='\033[0m'
+
+# ── What to track ─────────────────────────────────────────────────────────────
+# Format: "config-relative-source:dotfiles-relative-dest"
+# Trailing slash = directory (rsync semantics). No slash = single file.
+MAPPINGS=(
+    # Hyprland window manager
+    "hypr/:hypr/"
+    # Waybar status bar
+    "waybar/:waybar/"
+    # App launcher
+    "walker/:walker/"
+    # Notifications
+    "mako/:mako/"
+    # Terminal emulators (uncomment whichever you use)
+    "ghostty/:ghostty/"
+    # "alacritty/:alacritty/"
+    # "foot/:foot/"
+    # "kitty/:kitty/"
+    # Btop system monitor
+    "btop/:btop/"
+    # Lazygit
+    "lazygit/:lazygit/"
+    # Shell prompt
+    "starship.toml:starship.toml"
+    # Git identity
+    "git/config:git/config"
+)
+
+# Omarchy-specific mappings (source is under ~/.config/omarchy/)
+OMARCHY_MAPPINGS=(
+    "omarchy/hooks/:hooks/"
+    # Uncomment if you create custom themes
+    # "omarchy/themes/:themes/"
+)
+
+# Files/patterns to always exclude from rsync
+EXCLUDES=(
+    "*.bak.*"
+    "*.bak"
+    ".git"
+)
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+usage() {
+    echo -e "${BOLD}dots${RESET} — sync Omarchy configs to dotfiles"
+    echo ""
+    echo -e "  ${CYAN}dots${RESET}              Sync, show changes"
+    echo -e "  ${CYAN}dots -c${RESET}           Sync + commit (auto message)"
+    echo -e "  ${CYAN}dots -c 'msg'${RESET}     Sync + commit with custom message"
+    echo -e "  ${CYAN}dots -p${RESET}           Sync + commit + push"
+    echo -e "  ${CYAN}dots -p 'msg'${RESET}     Sync + commit with message + push"
+    echo -e "  ${CYAN}dots -s${RESET}           Status only (no sync)"
+    echo -e "  ${CYAN}dots -h${RESET}           Show this help"
+    echo ""
+    echo -e "Edit ${BOLD}~/dotfiles/sync${RESET} to add or remove tracked paths."
+}
+
+sync_item() {
+    local src="$1" dest="$2"
+    local ex_args=()
+    for ex in "${EXCLUDES[@]}"; do ex_args+=(--exclude="$ex"); done
+
+    if [[ "$src" == */ ]]; then
+        mkdir -p "$dest"
+        rsync -a --delete "${ex_args[@]}" "$src" "$dest"
+    else
+        mkdir -p "$(dirname "$dest")"
+        [[ -e "$src" ]] && rsync -a "${ex_args[@]}" "$src" "$dest"
+    fi
+}
+
+do_sync() {
+    echo -e "${BOLD}Syncing → $DOTFILES${RESET}"
+    echo ""
+    local synced=0 skipped=0
+
+    for mapping in "${MAPPINGS[@]}" "${OMARCHY_MAPPINGS[@]}"; do
+        local src_rel="${mapping%%:*}"
+        local dest_rel="${mapping##*:}"
+        local src="$CONFIG/$src_rel"
+        local dest="$DOTFILES/$dest_rel"
+
+        if [[ -e "${src%/}" ]]; then
+            sync_item "$src" "$dest"
+            echo -e "  ${GREEN}✓${RESET}  $src_rel"
+            (( synced++ )) || true
+        else
+            echo -e "  ${YELLOW}–${RESET}  $src_rel ${YELLOW}(not found, skipped)${RESET}"
+            (( skipped++ )) || true
+        fi
+    done
+
+    echo ""
+    echo -e "  synced ${GREEN}${synced}${RESET} items, skipped ${YELLOW}${skipped}${RESET}"
+    echo ""
+}
+
+# Returns 0 if there are changes, 1 if clean
+show_changes() {
+    cd "$DOTFILES"
+    local status
+    status=$(git status --short)
+    if [[ -z "$status" ]]; then
+        echo -e "${GREEN}Nothing changed.${RESET}"
+        return 1
+    fi
+    echo -e "${BOLD}Changes:${RESET}"
+    git status --short
+    echo ""
+    return 0
+}
+
+# ── Argument parsing ──────────────────────────────────────────────────────────
+COMMIT=false; PUSH=false; STATUS_ONLY=false; COMMIT_MSG=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c|--commit)
+            COMMIT=true; shift
+            [[ $# -gt 0 && "$1" != -* ]] && { COMMIT_MSG="$1"; shift; } || true
+            ;;
+        -p|--push)
+            COMMIT=true; PUSH=true; shift
+            [[ $# -gt 0 && "$1" != -* ]] && { COMMIT_MSG="$1"; shift; } || true
+            ;;
+        -s|--status)
+            STATUS_ONLY=true; shift ;;
+        -h|--help)
+            usage; exit 0 ;;
+        *)
+            echo -e "${RED}Unknown option: $1${RESET}"; echo ""; usage; exit 1 ;;
+    esac
+done
+
+# ── Main ──────────────────────────────────────────────────────────────────────
+cd "$DOTFILES"
+
+if $STATUS_ONLY; then
+    show_changes || true
+    exit 0
+fi
+
+do_sync
+
+if show_changes; then
+    if $COMMIT; then
+        [[ -z "$COMMIT_MSG" ]] && COMMIT_MSG="dotfiles: update $(date '+%Y-%m-%d %H:%M')"
+        git add -A
+        git commit -m "$COMMIT_MSG"
+        echo -e "${GREEN}Committed:${RESET} $COMMIT_MSG"
+
+        if $PUSH; then
+            git push
+            echo -e "${GREEN}Pushed to origin.${RESET}"
+        fi
+    else
+        echo -e "${CYAN}Tip:${RESET} run ${BOLD}dots -c${RESET} to commit, ${BOLD}dots -p${RESET} to commit and push."
+    fi
+fi
