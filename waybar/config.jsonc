@@ -64,8 +64,8 @@
     }
   },
   "clock": {
-    "format": "{:L%A %H:%M}",
-    "format-alt": "{:L%d %B W%V %Y}",
+    "format": " {:L%A %H:%M}",
+    "format-alt": " {:L%d %B W%V %Y}",
     "tooltip": false,
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
   },
@@ -172,13 +172,13 @@
     "format": "{icon}",
     "on-click": "omarchy-launch-audio",
     "on-click-right": "pamixer -t",
-    "tooltip-format": "Playing at {volume}%",
+    "tooltip-format": "{volume}%",
     "scroll-step": 5,
-    "format-muted": "",
+    "format-muted": "󰖁",
     "format-icons": {
-      "headphone": "",
-      "headset": "",
-      "default": ["", "", ""]
+      "headphone": "󰋋",
+      "headset": "󰋎",
+      "default": ["󰕿", "󰖀", "󰕾"]
     }
   },
   "cpu": {
