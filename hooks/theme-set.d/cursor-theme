@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Sync the active Omarchy theme to Cursor after every `omarchy theme set`.
+# Omarchy also runs omarchy-theme-set-vscode during theme changes; this hook
+# keeps Cursor sync explicit in ~/.config and is the place to add custom logic.
+
+omarchy-theme-set-vscode
