@@ -5,12 +5,12 @@
   border: none;
   border-radius: 0;
   min-height: 0;
-  /* Inter for text, Nerd Font as fallback for icon glyphs */
-  font-family: 'Inter Variable', 'CaskaydiaMono Nerd Font', sans-serif;
+  /* Inter for text, JetBrainsMono NF as fallback for icon glyphs only */
+  font-family: 'Inter Variable', 'JetBrainsMono Nerd Font', sans-serif;
   font-size: 14px;
   color: @foreground;
   background: transparent;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ── Bar window: single unified pill ─────────────────────────────────────── */
@@ -51,7 +51,7 @@ window#waybar {
 
 #workspaces button {
   all: initial;
-  font-family: 'CaskaydiaMono Nerd Font';
+  font-family: 'JetBrainsMono Nerd Font';
   font-size: 13px;
   color: @foreground;
   border-radius: 8px;
@@ -76,9 +76,14 @@ window#waybar {
 
 /* ── Clock ───────────────────────────────────────────────────────────────── */
 #clock {
+  /* thin left rule to visually separate from workspaces */
+  border-left: 1px solid alpha(@foreground, 0.15);
+  margin-left: 6px;
+  padding-left: 10px;
   padding-right: 4px;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
+  font-family: 'Inter Variable';
 }
 
 /* ── Media player ────────────────────────────────────────────────────────── */
@@ -104,19 +109,6 @@ window#waybar {
 }
 
 /* ── Right-side status icons ─────────────────────────────────────────────── */
-#custom-weather {
-  /* thin left rule to visually separate from workspaces */
-  border-left: 1px solid alpha(@foreground, 0.15);
-  margin-left: 6px;
-  padding-left: 10px;
-  margin-right: 14px;
-}
-
-#custom-weather.unavailable {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-}
 
 #custom-update {
   margin: 0 9px;
@@ -221,17 +213,16 @@ menu,
 }
 
 menuitem {
-  border-radius: 8px;
   padding: 5px 12px;
   color: @foreground;
   min-height: 0;
   transition: background-color 120ms ease;
-  font-size: 10px;
+  
 }
 
 menuitem:hover,
 menuitem:focus {
-  background: alpha(@background, 0.95);
+  background: alpha(@foreground, 0.10);
   color: @foreground;
 }
 

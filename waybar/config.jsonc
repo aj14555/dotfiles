@@ -11,7 +11,6 @@
   "modules-left": [
     "custom/omarchy",
     "hyprland/workspaces",
-    "custom/weather",
     "clock"
   ],
   "modules-center": [
@@ -74,9 +73,10 @@
   // ── Center ────────────────────────────────────────────────────────────────
 
   "mpris": {
-    "format": "{player_icon}  {dynamic}",
+    "format": "{player_icon}   {dynamic}",
     "format-paused": "{player_icon}  {dynamic}",
     "format-stopped": "",
+    "interval": 1,
     "player-icons": {
       "default": "▶",
       "spotify": "",
@@ -101,14 +101,6 @@
   },
 
   // ── Right ─────────────────────────────────────────────────────────────────
-
-  "custom/weather": {
-    "exec": "$OMARCHY_PATH/default/waybar/weather.sh",
-    "return-type": "json",
-    "interval": 60,
-    "tooltip": false,
-    "on-click": "notify-send -u low \"$(omarchy-weather-status)\""
-  },
   "custom/update": {
     "format": "",
     "exec": "omarchy-update-available",
