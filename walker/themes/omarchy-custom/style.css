@@ -55,14 +55,20 @@ scrollbar {
 child {
   border-radius: 8px;
   transition: background 100ms ease;
+  opacity: 0.8;
+}
+
+child:hover {
+  opacity: 0.7;
 }
 
 child:hover .item-box {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 child:selected {
-  background: alpha(@selected-text, 0.15);
+  background: alpha(@text, 0.07);
+  opacity: 1;
 }
 
 .item-box {

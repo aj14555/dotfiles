@@ -16,27 +16,27 @@
     "mpris"
   ],
   "modules-right": [
-    "custom/update",
-    "custom/voxtype",
-    "custom/screenrecording-indicator",
-    "custom/idle-indicator",
-    "custom/notification-silencing-indicator",
     "group/tray-expander",
     "bluetooth",
     "network",
     "pulseaudio",
     "cpu",
     "battery",
-    "clock"
+    "clock",
+    "custom/update",
+    "custom/voxtype",
+    "custom/screenrecording-indicator",
+    "custom/idle-indicator",
+    "custom/notification-silencing-indicator"
   ],
 
   // ── Left ──────────────────────────────────────────────────────────────────
 
   "custom/omarchy": {
-    "format": "<span font='omarchy'>\ue900</span>",
+    "format": "",
     "on-click": "omarchy-menu",
     "on-click-right": "xdg-terminal-exec",
-    "tooltip-format": "Omarchy Menu\n\nSuper + Alt + Space"
+    "tooltip-format": "Launcher Menu\n\nSuper + Alt + Space"
   },
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -135,7 +135,9 @@
     "modules": ["custom/expand-icon", "tray"]
   },
   "custom/expand-icon": {
-    "format": "",
+    "exec": "/home/akila/.config/waybar/scripts/tray-detect.sh",
+    "return-type": "json",
+    "interval": 5,
     "tooltip": false,
     "on-scroll-up": "",
     "on-scroll-down": "",
@@ -174,11 +176,11 @@
     "on-click-right": "pamixer -t",
     "tooltip-format": "{volume}%",
     "scroll-step": 5,
-    "format-muted": "󰖁",
+    "format-muted": "",
     "format-icons": {
       "headphone": "󰋋",
       "headset": "󰋎",
-      "default": ["󰕿", "󰖀", "󰕾"]
+      "default": ["", "", ""]
     }
   },
   "cpu": {

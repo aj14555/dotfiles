@@ -160,8 +160,7 @@ window#waybar {
 }
 
 #cpu {
-  min-width: 12px;
-  margin: 0 10px;
+  margin: 0 10px 0 5px;
 }
 
 #battery {

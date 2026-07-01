@@ -41,7 +41,9 @@ MAPPINGS=(
     # Shell prompt
     "starship.toml:starship.toml"
     # Git identity
-    "git/config:git/config"
+    "git/config:git/config",
+    #Neovim
+    "nvim/:nvim/"
 )
 
 # Omarchy-specific mappings (source is under ~/.config/omarchy/)
