@@ -147,25 +147,22 @@ window#waybar {
 }
 
 /* ── Connectivity + system icons ─────────────────────────────────────────── */
-#bluetooth {
-  margin: 0 5px;
-}
-
-#network {
-  margin: 0 10px;
-}
-
-#pulseaudio {
-  margin: 0 10px;
-}
-
-#cpu {
-  margin: 0 10px 0 5px;
-}
-
+/* Fixed-width slot per icon — centers each glyph regardless of its natural width */
+#bluetooth,
+#network,
+#pulseaudio,
+#cpu,
 #battery {
-  min-width: 12px;
-  margin: 0 6px 0 4px;
+  min-width: 32px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Bluetooth glyph is inherently narrower — tighter slot to compensate */
+#bluetooth {
+  min-width: 16px;
+  font-size: 16px;
+  margin-left: 4px;
 }
 
 #battery.warning {

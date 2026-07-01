@@ -145,7 +145,7 @@
     "on-scroll-right": ""
   },
   "tray": {
-    "icon-size": 12,
+    "icon-size": 18,
     "spacing": 14
   },
   "bluetooth": {
@@ -178,7 +178,7 @@
     "scroll-step": 5,
     "format-muted": "",
     "format-icons": {
-      "headphone": "󰋋",
+      "headphone": "",
       "headset": "󰋎",
       "default": ["", "", ""]
     }
