@@ -184,64 +184,15 @@ tooltip label {
   color: @foreground;
 }
 
-/* ── Tray icon context menus ─────────────────────────────────────────────── */
-
-/* Strip the outer GTK popup window — transparent so only the rounded menu shows */
-window.popup {
-  background: transparent;
-}
-
-window.popup decoration {
-  box-shadow: none;
-  border: none;
-  background: transparent;
-}
-
 menu,
 .menu,
 .context-menu {
-  background: alpha(@background, 0.95);
-  color: @foreground;
-  border: 1px solid alpha(@foreground, 0.13);
-  padding: 4px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.40);
-  font-size: 13px;
-}
-
-menuitem {
-  padding: 5px 12px;
-  color: @foreground;
-  min-height: 0;
-  transition: background-color 120ms ease;
-  font-weight: 400;
+  background: alpha(@background, 0.92);
 }
 
 menuitem:hover,
 menuitem:focus {
   background: alpha(@foreground, 0.10);
-  color: @foreground;
-}
-
-menuitem:disabled {
-  color: alpha(@foreground, 0.35);
-  background-color: transparent;
-}
-
-menuitem image {
-  margin-right: 8px;
-  opacity: 0.85;
-}
-
-menuitem arrow {
-  color: alpha(@foreground, 0.50);
-  min-width: 14px;
-  min-height: 14px;
-}
-
-separator {
-  background-color: alpha(@foreground, 0.13);
-  min-height: 1px;
-  margin: 3px 8px;
 }
 
 /* ── Hidden class (used by omarchy indicators) ───────────────────────────── */

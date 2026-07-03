@@ -41,16 +41,22 @@ MAPPINGS=(
     # Shell prompt
     "starship.toml:starship.toml"
     # Git identity
-    "git/config:git/config",
-    #Neovim
+    "git/config:git/config"
+    # On-screen display (volume/brightness)
+    "swayosd/:swayosd/"
+    # System monospace font (updated by omarchy font set)
+    "fontconfig/:fontconfig/"
+    # Neovim
     "nvim/:nvim/"
 )
 
 # Omarchy-specific mappings (source is under ~/.config/omarchy/)
 OMARCHY_MAPPINGS=(
     "omarchy/hooks/:hooks/"
-    # Uncomment if you create custom themes
-    # "omarchy/themes/:themes/"
+    "omarchy/themes/:themes/"
+    "omarchy/extensions/:extensions/"
+    "omarchy/starship/:starship/"
+    "omarchy/branding/:branding/"
 )
 
 # Files/patterns to always exclude from rsync

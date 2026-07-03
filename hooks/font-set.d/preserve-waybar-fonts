@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Restore waybar fonts after omarchy-font-set overwrites every font-family in style.css.
+
+STYLE="$HOME/.config/waybar/style.css"
+PRESERVE="$HOME/.config/waybar/fonts.preserve"
+
+[[ -f $STYLE && -f $PRESERVE ]] || exit 0
+
+python3 - "$STYLE" "$PRESERVE" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+style_path = Path(sys.argv[1])
+preserve_path = Path(sys.argv[2])
+text = style_path.read_text()
+
+preserved = {}
+for line in preserve_path.read_text().splitlines():
+    line = line.strip()
+    if not line or (line.startswith("#") and "=" not in line):
+        continue
+    selector, _, family = line.partition("=")
+    selector = selector.strip()
+    family = family.strip()
+    if selector and family:
+        preserved[selector] = family
+
+for selector, family in preserved.items():
+    pattern = rf"({re.escape(selector)}\s*\{{[^{{}}]*?)font-family:\s*[^;]+;"
+    text, _ = re.subn(pattern, rf"\1font-family: {family};", text, count=1)
+
+style_path.write_text(text)
+PY
+
+omarchy-restart-waybar

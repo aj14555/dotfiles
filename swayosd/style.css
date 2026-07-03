@@ -1,0 +1,35 @@
+@import "../omarchy/current/theme/swayosd.css";
+
+window {
+  border-radius: 12px;
+  background-color: alpha(@background-color, 0.60);
+  border: 1px solid alpha(@border-color, 0.18);
+}
+
+* {
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 13px;
+  color: @label;
+}
+
+image {
+  color: @image;
+  min-width: 24px;
+  min-height: 24px;
+  margin: 0 8px 0 4px;
+}
+
+progressbar,
+progressbar > trough,
+progressbar > trough > progress {
+  border-radius: 6px;
+  min-height: 6px;
+}
+
+progressbar > trough {
+  background-color: alpha(@border-color, 0.15);
+}
+
+progressbar > trough > progress {
+  background-color: @progress;
+}

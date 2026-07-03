@@ -19,7 +19,7 @@ scrollbar {
 .box-wrapper {
   background: alpha(@base, 0.60);
   border-radius: 16px;
-  border: 1px solid alpha(@border, 0.18);
+  border: 2px solid alpha(@border, 0.18);
   padding: 10px;
 }
 
