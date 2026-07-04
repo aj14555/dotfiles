@@ -21,7 +21,7 @@ window#waybar {
 }
 
 .modules-left {
-  padding: 0 6px;
+  padding: 0 8px;
 }
 
 .modules-center {
@@ -29,7 +29,7 @@ window#waybar {
 }
 
 .modules-right {
-  padding: 0 6px;
+  padding: 0 8px;
 }
 
 /* ── Omarchy launcher ────────────────────────────────────────────────────── */
@@ -148,21 +148,35 @@ window#waybar {
 
 /* ── Connectivity + system icons ─────────────────────────────────────────── */
 /* Fixed-width slot per icon — centers each glyph regardless of its natural width */
-#bluetooth,
-#network,
-#pulseaudio,
-#cpu,
-#battery {
-  min-width: 32px;
-  margin: 0;
-  padding: 0;
+/* #bluetooth, */
+/* #network, */
+/* #pulseaudio, */
+/* #battery { */
+/*   min-width: 36px; */
+/*   margin: 0; */
+/*   padding: 0; */
+/* } */
+
+#cpu {
+  min-width: 36px;
 }
 
-/* Bluetooth glyph is inherently narrower — tighter slot to compensate */
+#network {
+  min-width: 36px;
+}
+
+#pulseaudio {
+  min-width: 26px;
+}
+
 #bluetooth {
   min-width: 16px;
   font-size: 16px;
   margin-left: 4px;
+}
+
+#battery {
+  min-width: 24px;
 }
 
 #battery.warning {

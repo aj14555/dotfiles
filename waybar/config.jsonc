@@ -142,11 +142,12 @@
     "on-scroll-up": "",
     "on-scroll-down": "",
     "on-scroll-left": "",
-    "on-scroll-right": ""
+    "on-scroll-right": "",
+    "icon-size": 14
   },
   "tray": {
-    "icon-size": 18,
-    "spacing": 14
+    "icon-size": 14,
+    "spacing": 20
   },
   "bluetooth": {
     "format": "󰂯",

@@ -9,4 +9,15 @@ return {
 			colorscheme = "oxocarbon",
 		},
 	},
+	{
+		"akinsho/bufferline.nvim",
+		opts = {
+			highlights = {
+				indicator_selected = {
+					fg = "#d8dee9",
+					default = false,
+				},
+			},
+		},
+	},
 }

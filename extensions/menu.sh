@@ -15,9 +15,10 @@
 #
 # Example of overriding just the about menu action: (Using zsh instead of bash (default))
 #
-# show_about() {
-#   exec omarchy-launch-or-focus-tui "zsh -c 'fastfetch; read -k 1'"
-# }
+show_about() {
+  exec omarchy-launch-or-focus org.omarchy.about \
+      "uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.about -e bash -c 'while [ \"\$(tput cols 2>/dev/null || echo 0)\" -lt 120 ]; do sleep 0.05; done; fastfetch; read -n 1 -s'"
+}
 
 # ── Icon spacing fix ──────────────────────────────────────────────────────────
 # Override menu() to replace the double-space between icon glyph and label with
