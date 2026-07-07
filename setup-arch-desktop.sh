@@ -39,7 +39,7 @@ PACMAN_PKGS=(
     # Wayland / Hyprland core
     hyprland uwsm hypridle hyprlock hyprsunset hyprpicker
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-    xdg-terminal-exec xdg-utils
+    xdg-utils
 
     # Session
     sddm
@@ -101,6 +101,7 @@ PACMAN_PKGS=(
 )
 
 AUR_PKGS=(
+    xdg-terminal-exec  # Not in core repos on plain Arch
     walker-bin          # App launcher (walker)
     ghostty             # Terminal emulator
     impala              # TUI wifi manager
@@ -109,6 +110,12 @@ AUR_PKGS=(
     wl-screenrec        # Screen recorder (GPU-accelerated)
     wiremix             # TUI audio mixer
 )
+
+# pipewire-jack replaces jack2; a fresh/minimal install may already have jack2.
+if pacman -Q jack2 &>/dev/null; then
+    info "Removing jack2 (conflicts with pipewire-jack)…"
+    sudo pacman -R --noconfirm jack2
+fi
 
 info "Installing official packages…"
 sudo pacman -S --needed --noconfirm "${PACMAN_PKGS[@]}"
