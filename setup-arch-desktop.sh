@@ -111,10 +111,11 @@ AUR_PKGS=(
     wiremix             # TUI audio mixer
 )
 
-# pipewire-jack replaces jack2; a fresh/minimal install may already have jack2.
-if pacman -Q jack2 &>/dev/null; then
-    info "Removing jack2 (conflicts with pipewire-jack)…"
-    sudo pacman -R --noconfirm jack2
+# pipewire-jack conflicts with jack2 but provides the virtual `jack` package.
+# Must swap in one transaction — removing jack2 alone breaks ffmpeg/portaudio.
+if pacman -Q jack2 &>/dev/null && ! pacman -Q pipewire-jack &>/dev/null; then
+    info "Replacing jack2 with pipewire-jack…"
+    sudo pacman -S --needed --noconfirm pipewire-jack
 fi
 
 info "Installing official packages…"
