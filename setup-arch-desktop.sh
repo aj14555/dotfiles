@@ -107,7 +107,7 @@ AUR_PKGS=(
     impala              # TUI wifi manager
     bluetui             # TUI bluetooth manager
     satty               # Screenshot annotator
-    wl-screenrec        # Screen recorder (GPU-accelerated)
+    wl-screenrec-git    # Screen recorder (GPU-accelerated)
     wiremix             # TUI audio mixer
 )
 
