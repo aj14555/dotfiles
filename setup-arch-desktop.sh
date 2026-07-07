@@ -112,10 +112,10 @@ AUR_PKGS=(
 )
 
 # pipewire-jack conflicts with jack2 but provides the virtual `jack` package.
-# Must swap in one transaction — removing jack2 alone breaks ffmpeg/portaudio.
+# --noconfirm alone aborts here (defaults to N on conflict), so confirm removal.
 if pacman -Q jack2 &>/dev/null && ! pacman -Q pipewire-jack &>/dev/null; then
     info "Replacing jack2 with pipewire-jack…"
-    sudo pacman -S --needed --noconfirm pipewire-jack
+    printf 'y\n' | sudo pacman -S --needed --noconfirm pipewire-jack
 fi
 
 info "Installing official packages…"
