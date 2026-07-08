@@ -1,4 +1,4 @@
-@import "../omarchy/current/theme/waybar.css";
+@import "../desktop/current/theme/waybar.css";
 
 /* ── Reset ───────────────────────────────────────────────────────────────── */
 * {
@@ -33,14 +33,14 @@ window#waybar {
 }
 
 /* ── Omarchy launcher ────────────────────────────────────────────────────── */
-#custom-omarchy {
+#custom-menu {
   min-width: 12px;
   margin: 0 4px 0 2px;
   font-size: 15px;
   opacity: 0.85;
 }
 
-#custom-omarchy:hover {
+#custom-menu:hover {
   opacity: 1;
 }
 
@@ -209,7 +209,7 @@ menuitem:focus {
   background: alpha(@foreground, 0.10);
 }
 
-/* ── Hidden class (used by omarchy indicators) ───────────────────────────── */
+/* ── Hidden class (used by status indicators) ────────────────────────────── */
 .hidden {
   opacity: 0;
   min-width: 0;

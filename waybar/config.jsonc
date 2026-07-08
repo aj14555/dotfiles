@@ -9,7 +9,7 @@
   "margin-right": 8,
 
   "modules-left": [
-    "custom/omarchy",
+    "custom/menu",
     "hyprland/workspaces"
   ],
   "modules-center": [
@@ -32,7 +32,7 @@
 
   // ── Left ──────────────────────────────────────────────────────────────────
 
-  "custom/omarchy": {
+  "custom/menu": {
     "format": "",
     "on-click": "omarchy-menu",
     "on-click-right": "xdg-terminal-exec",
@@ -89,9 +89,9 @@
   // ── Right ─────────────────────────────────────────────────────────────────
   "custom/update": {
     "format": "",
-    "exec": "omarchy-update-available",
-    "on-click": "omarchy-launch-floating-terminal-with-presentation omarchy-update",
-    "tooltip-format": "Omarchy update available",
+    "exec": "check-updates",
+    "on-click": "omarchy-launch-floating-terminal-with-presentation system-update",
+    "tooltip-format": "System update available",
     "signal": 7,
     "interval": 21600
   },

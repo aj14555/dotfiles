@@ -1,4 +1,4 @@
-# Waybar font-family values preserved when changing system font via omarchy menu.
+# Waybar font-family values preserved when changing system font via the menu.
 # One rule per line: SELECTOR=quoted font stack
 *='Inter Variable', 'JetBrainsMono Nerd Font', sans-serif
 #workspaces button='JetBrainsMono Nerd Font'

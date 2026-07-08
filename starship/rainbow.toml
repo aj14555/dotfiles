@@ -1,6 +1,6 @@
 # Omarchy rainbow Starship preset (gruvbox-rainbow style).
-# Palette colors are injected by ~/.config/omarchy/hooks/theme-set.d/starship-theme
-# from the active theme's colors.toml on every `omarchy theme set`.
+# Palette colors are injected by ~/.config/desktop/hooks/theme-set.d/starship-theme
+# from the active theme's colors.toml on every theme change.
 
 format = """
 [](color_orange)\

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dots/sync — Sync Omarchy customizations to ~/dotfiles and optionally commit.
+# dots/sync — Sync desktop configs to ~/dotfiles and optionally commit.
 #
 # Usage:
 #   dots              Sync configs, show what changed
@@ -48,15 +48,17 @@ MAPPINGS=(
     "fontconfig/:fontconfig/"
     # Neovim
     "nvim/:nvim/"
+    # Bash shell setup
+    "bash/:bash/"
 )
 
-# Omarchy-specific mappings (source is under ~/.config/omarchy/)
-OMARCHY_MAPPINGS=(
-    "omarchy/hooks/:hooks/"
-    "omarchy/themes/:themes/"
-    "omarchy/extensions/:extensions/"
-    "omarchy/starship/:starship/"
-    "omarchy/branding/:branding/"
+# Desktop-specific mappings (source is under ~/.config/desktop/)
+DESKTOP_MAPPINGS=(
+    "desktop/hooks/:hooks/"
+    "desktop/themes/:themes/"
+    "desktop/extensions/:extensions/"
+    "desktop/starship/:starship/"
+    "desktop/branding/:branding/"
 )
 
 # Files/patterns to always exclude from rsync
@@ -68,7 +70,7 @@ EXCLUDES=(
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 usage() {
-    echo -e "${BOLD}dots${RESET} — sync Omarchy configs to dotfiles"
+    echo -e "${BOLD}dots${RESET} — sync desktop configs to dotfiles"
     echo ""
     echo -e "  ${CYAN}dots${RESET}              Sync, show changes"
     echo -e "  ${CYAN}dots -c${RESET}           Sync + commit (auto message)"
@@ -79,6 +81,7 @@ usage() {
     echo -e "  ${CYAN}dots -h${RESET}           Show this help"
     echo ""
     echo -e "Edit ${BOLD}~/dotfiles/sync${RESET} to add or remove tracked paths."
+
 }
 
 sync_item() {
@@ -100,7 +103,7 @@ do_sync() {
     echo ""
     local synced=0 skipped=0
 
-    for mapping in "${MAPPINGS[@]}" "${OMARCHY_MAPPINGS[@]}"; do
+    for mapping in "${MAPPINGS[@]}" "${DESKTOP_MAPPINGS[@]}"; do
         local src_rel="${mapping%%:*}"
         local dest_rel="${mapping##*:}"
         local src="$CONFIG/$src_rel"

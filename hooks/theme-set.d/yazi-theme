@@ -1,8 +1,8 @@
 #!/bin/bash
-# Regenerate ~/.config/yazi/theme.toml from the active omarchy theme colors.
-# Runs automatically after every `omarchy theme set`.
+# Regenerate ~/.config/yazi/theme.toml from the active theme colors.
+# Runs automatically after every theme change.
 
-COLORS="$HOME/.config/omarchy/current/theme/colors.toml"
+COLORS="$HOME/.config/desktop/current/theme/colors.toml"
 
 c() { grep "^$1 " "$COLORS" | grep -o '"[^"]*"' | tr -d '"'; }
 
