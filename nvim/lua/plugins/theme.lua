@@ -1,1 +1,1 @@
-/home/akila/.config/omarchy/current/theme/neovim.lua
+/home/akila/.config/desktop/current/theme/neovim.lua
