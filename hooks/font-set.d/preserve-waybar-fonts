@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Restore waybar fonts after omarchy-font-set overwrites every font-family in style.css.
+# Restore waybar fonts after sys-font-set overwrites every font-family in style.css.
 
 STYLE="$HOME/.config/waybar/style.css"
 PRESERVE="$HOME/.config/waybar/fonts.preserve"
@@ -34,4 +34,4 @@ for selector, family in preserved.items():
 style_path.write_text(text)
 PY
 
-omarchy-restart-waybar
+sys-restart-waybar

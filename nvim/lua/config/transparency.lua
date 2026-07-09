@@ -61,9 +61,9 @@ end
 
 function M.setup()
 	M.apply()
-	_G.omarchy_apply_transparency = M.apply
+	_G.sys_apply_transparency = M.apply
 
-	local group = vim.api.nvim_create_augroup("omarchy_transparency", { clear = true })
+	local group = vim.api.nvim_create_augroup("sys_transparency", { clear = true })
 
 	-- Defer so we run after other ColorScheme handlers
 	vim.api.nvim_create_autocmd("ColorScheme", {

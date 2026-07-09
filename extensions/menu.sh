@@ -1,5 +1,5 @@
-# Overwrite parts of the omarchy-menu with user-specific submenus.
-# See $OMARCHY_PATH/bin/omarchy-menu for functions that can be overwritten.
+# Overwrite parts of the sys-menu with user-specific submenus.
+# See $OMARCHY_PATH/bin/sys-menu for functions that can be overwritten.
 #
 # WARNING: Overwritten functions will not be updated when the system menu changes.
 #
@@ -7,8 +7,8 @@
 #
 # show_system_menu() {
 #   case $(menu "System" "  Lock\n󰐥  Shutdown") in
-#   *Lock*) omarchy-system-lock ;;
-#   *Shutdown*) omarchy-system-shutdown ;;
+#   *Lock*) sys-system-lock ;;
+#   *Shutdown*) sys-system-shutdown ;;
 #   *) back_to show_main_menu ;;
 #   esac
 # }
@@ -16,7 +16,7 @@
 # Example of overriding just the about menu action: (Using zsh instead of bash (default))
 #
 show_about() {
-  exec omarchy-launch-or-focus org.omarchy.about \
+  exec sys-launch-or-focus org.omarchy.about \
       "uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.about -e bash -c 'while [ \"\$(tput cols 2>/dev/null || echo 0)\" -lt 120 ]; do sleep 0.05; done; fastfetch; read -n 1 -s'"
 }
 
@@ -47,7 +47,7 @@ menu() {
 
   # Run walker, capture result, then restore em space → two spaces for callers
   local result
-  result=$(echo "$transformed" | omarchy-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null)
+  result=$(echo "$transformed" | sys-launch-walker --dmenu --width 295 --minheight 1 --maxheight 630 -p "$prompt…" "${args[@]}" 2>/dev/null)
 
   echo "${result//${EM}/  }"
 }

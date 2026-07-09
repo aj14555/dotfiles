@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+# dots/install — Deploy dotfiles from repo into ~/.config (reverse of sync).
+#
+# Usage:
+#   install           Deploy all configs
+#   install --dry-run Show what would be copied without doing it
+#   install --help    Show this help
+#
+# Safe to re-run: rsync only overwrites files that differ.
+
+set -euo pipefail
+
+DOTFILES="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+CONFIG="$HOME/.config"
+DESKTOP="$HOME/.config/desktop"
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'
+RED='\033[0;31m'; BOLD='\033[1m'; RESET='\033[0m'
+
+# ── What to deploy (mirrors sync MAPPINGS in reverse) ─────────────────────────
+# Format: "dotfiles-relative-source:config-relative-dest"
+# Trailing slash = directory. No slash = single file.
+MAPPINGS=(
+    "hypr/:hypr/"
+    "waybar/:waybar/"
+    "walker/:walker/"
+    "mako/:mako/"
+    "ghostty/:ghostty/"
+    "btop/:btop/"
+    "lazygit/:lazygit/"
+    "starship.toml:starship.toml"
+    "git/config:git/config"
+    "swayosd/:swayosd/"
+    "fontconfig/:fontconfig/"
+    "nvim/:nvim/"
+    "bash/:bash/"
+)
+
+# Desktop config mappings (deploy into ~/.config/desktop/)
+DESKTOP_MAPPINGS=(
+    "hooks/:desktop/hooks/"
+    "themes/:desktop/themes/"
+    "extensions/:desktop/extensions/"
+    "starship/:desktop/starship/"
+    "branding/:desktop/branding/"
+)
+
+EXCLUDES=(
+    "*.bak.*"
+    "*.bak"
+    ".git"
+)
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+usage() {
+    echo -e "${BOLD}install${RESET} — deploy dotfiles into ~/.config"
+    echo ""
+    echo -e "  ${CYAN}install${RESET}           Deploy all configs"
+    echo -e "  ${CYAN}install --dry-run${RESET} Show what would change"
+    echo -e "  ${CYAN}install --help${RESET}    Show this help"
+    echo ""
+    echo -e "Edit ${BOLD}~/dotfiles/install${RESET} to add or remove deployed paths."
+}
+
+deploy_item() {
+    local src="$1" dest="$2"
+    local ex_args=() dry_args=()
+    for ex in "${EXCLUDES[@]}"; do ex_args+=(--exclude="$ex"); done
+    $DRY_RUN && dry_args+=(--dry-run)
+
+    if [[ "$src" == */ ]]; then
+        mkdir -p "$dest"
+        rsync -a --delete "${ex_args[@]}" "${dry_args[@]}" "$src" "$dest"
+    else
+        mkdir -p "$(dirname "$dest")"
+        [[ -e "$src" ]] && rsync -a "${ex_args[@]}" "${dry_args[@]}" "$src" "$dest"
+    fi
+}
+
+# ── Args ──────────────────────────────────────────────────────────────────────
+DRY_RUN=false
+case "${1:-}" in
+    --dry-run) DRY_RUN=true ;;
+    --help|-h) usage; exit 0 ;;
+    "") ;;
+    *) echo -e "${RED}Unknown option: $1${RESET}"; usage; exit 1 ;;
+esac
+
+$DRY_RUN && echo -e "${YELLOW}[DRY RUN] No files will be changed${RESET}\n"
+
+echo -e "${BOLD}Deploying dotfiles → $CONFIG${RESET}\n"
+
+deployed=0; skipped=0
+
+# ── Deploy config mappings ─────────────────────────────────────────────────
+for mapping in "${MAPPINGS[@]}"; do
+    src_rel="${mapping%%:*}"
+    dest_rel="${mapping##*:}"
+    src="$DOTFILES/$src_rel"
+    dest="$CONFIG/$dest_rel"
+
+    if [[ -e "${src%/}" ]]; then
+        deploy_item "$src" "$dest"
+        echo -e "  ${GREEN}✓${RESET}  $src_rel"
+        (( deployed++ )) || true
+    else
+        echo -e "  ${YELLOW}–${RESET}  $src_rel ${YELLOW}(not in dotfiles, skipped)${RESET}"
+        (( skipped++ )) || true
+    fi
+done
+
+# ── Deploy desktop/ mappings ───────────────────────────────────────────────
+for mapping in "${DESKTOP_MAPPINGS[@]}"; do
+    src_rel="${mapping%%:*}"
+    dest_rel="${mapping##*:}"
+    src="$DOTFILES/$src_rel"
+    dest="$CONFIG/$dest_rel"
+
+    if [[ -e "${src%/}" ]]; then
+        deploy_item "$src" "$dest"
+        echo -e "  ${GREEN}✓${RESET}  $src_rel → $dest_rel"
+        (( deployed++ )) || true
+    else
+        echo -e "  ${YELLOW}–${RESET}  $src_rel ${YELLOW}(not in dotfiles, skipped)${RESET}"
+        (( skipped++ )) || true
+    fi
+done
+
+echo ""
+echo -e "  deployed ${GREEN}${deployed}${RESET} items, skipped ${YELLOW}${skipped}${RESET}"
+
+# ── Desktop current/ symlink ───────────────────────────────────────────────
+# Set up ~/.config/desktop/current/ pointing at the default-dark theme.
+# On an existing system with a different theme, this recreates if current/
+# doesn't already exist so we don't overwrite a user-chosen theme.
+if [[ ! -d "$DESKTOP/current/theme" ]]; then
+    echo ""
+    echo -e "${BOLD}Setting up desktop theme…${RESET}"
+    DEFAULT_THEME="default-dark"
+    THEME_DIR="$DESKTOP/themes/$DEFAULT_THEME"
+
+    if [[ -d "$THEME_DIR" ]]; then
+        mkdir -p "$DESKTOP/current"
+        ln -sfn "$THEME_DIR" "$DESKTOP/current/theme"
+        echo -e "  ${GREEN}✓${RESET}  current/theme → themes/$DEFAULT_THEME"
+    else
+        echo -e "  ${YELLOW}–${RESET}  themes/$DEFAULT_THEME not found; skipping current/theme symlink"
+    fi
+
+    # Set up background symlink — use any jpg in default-dark/backgrounds/
+    BG_DIR="$DESKTOP/backgrounds/$DEFAULT_THEME"
+    if [[ -d "$BG_DIR" ]]; then
+        first_bg=$(find "$BG_DIR" -maxdepth 1 \( -name "*.jpg" -o -name "*.png" \) | sort | head -1)
+        if [[ -n "$first_bg" ]]; then
+            ln -sfn "$first_bg" "$DESKTOP/current/background"
+            echo -e "  ${GREEN}✓${RESET}  current/background → $(basename "$first_bg")"
+        fi
+    fi
+
+    # Write theme.name
+    echo -n "$DEFAULT_THEME" > "$DESKTOP/current/theme.name" 2>/dev/null || true
+fi
+
+# ── State dirs ─────────────────────────────────────────────────────────────
+mkdir -p \
+    "$HOME/.local/state/desktop/toggles/hypr" \
+    "$HOME/.local/state/hl"
+
+# ── UWSM config files ──────────────────────────────────────────────────────
+UWSM_DIR="$CONFIG/uwsm"
+mkdir -p "$UWSM_DIR"
+
+if [[ ! -f "$UWSM_DIR/env" ]] || $DRY_RUN; then
+    echo ""
+    echo -e "${BOLD}Writing UWSM config…${RESET}"
+fi
+
+if ! $DRY_RUN; then
+    cat > "$UWSM_DIR/env" <<'EOF'
+# Changes require a restart to take effect.
+
+# Ensure user/system bins are in the path
+export PATH=$HOME/.local/bin:$PATH
+
+# Set default terminal and editor
+source ~/.config/uwsm/default
+EOF
+    echo -e "  ${GREEN}✓${RESET}  uwsm/env"
+
+    cat > "$UWSM_DIR/default" <<'EOF'
+export TERMINAL=xdg-terminal-exec
+export EDITOR=nvim
+export SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
+export SCREENRECORD_DIR="$HOME/Videos/Screencasts"
+EOF
+    echo -e "  ${GREEN}✓${RESET}  uwsm/default"
+fi
+
+# ── .bashrc source line ────────────────────────────────────────────────────
+SHELL_RC="$HOME/.bashrc"
+if ! grep -qF 'source ~/.config/bash/rc' "$SHELL_RC" 2>/dev/null; then
+    if ! $DRY_RUN; then
+        printf '\n# Shell setup from dotfiles\n[[ $- == *i* ]] && source ~/.config/bash/rc\n' >> "$SHELL_RC"
+        echo -e "\n  ${GREEN}✓${RESET}  Added source ~/.config/bash/rc to $SHELL_RC"
+    else
+        echo -e "\n  ${CYAN}[dry]${RESET}  Would add source ~/.config/bash/rc to $SHELL_RC"
+    fi
+fi
+
+echo ""
+echo -e "${GREEN}${BOLD}Done.${RESET} Config deployed to $CONFIG"
+echo ""
+echo -e "Reload your shell (${CYAN}source ~/.bashrc${RESET}) and re-login or restart Hyprland."

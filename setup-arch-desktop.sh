@@ -39,9 +39,9 @@ PACMAN_PKGS=(
     # Wayland / Hyprland core
     hyprland uwsm hypridle hyprlock hyprsunset hyprpicker
     xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-    xdg-utils
+    xdg-utils xdg-user-dirs
 
-    # Session
+    # Session / display manager
     sddm
 
     # Status bar
@@ -63,53 +63,104 @@ PACMAN_PKGS=(
     # Bluetooth
     bluez bluez-utils
 
-    # Brightness
-    brightnessctl
+    # Brightness / power
+    brightnessctl power-profiles-daemon
 
     # Screenshot / screen capture
     grim slurp wl-clipboard hyprland-guiutils
-    tesseract tesseract-data-eng imagemagick
+    tesseract tesseract-data-eng imagemagick satty
 
     # Network
     iwd
 
-    # Polkit agent
-    polkit-gnome
+    # Polkit / keyring
+    polkit-gnome gnome-keyring
 
     # Qt Wayland / theming
     qt5-wayland qt6-wayland kvantum-qt5
 
-    # File manager
-    nautilus gvfs gvfs-mtp
+    # GTK / GNOME utilities
+    nautilus gvfs gvfs-mtp gvfs-smb gnome-disk-utility
+    gnome-calculator gnome-themes-extra yaru-icon-theme
 
     # System monitor / TUI tools
     btop lazygit tmux fzf bat eza zoxide fastfetch starship
+    fd ripgrep dust tldr
 
     # Fonts
     inter-font ttf-jetbrains-mono-nerd ttf-cascadia-mono-nerd
-    noto-fonts noto-fonts-emoji
+    ttf-firacode-nerd noto-fonts noto-fonts-emoji noto-fonts-cjk
 
     # Clipboard history
     cliphist
 
-    # Misc utilities
-    jq gum imagemagick woff2-font-awesome
-    xdg-user-dirs bash-completion
+    # Shell / utilities
+    jq gum wget unzip less bash-completion
+    woff2-font-awesome git github-cli
 
     # Media
     mpv ffmpegthumbnailer
+
+    # Input method
+    fcitx5 fcitx5-gtk fcitx5-qt
+
+    # Dev tools
+    mise
+
+    # System / misc
+    flatpak ufw zram-generator
 )
 
 AUR_PKGS=(
-    xdg-terminal-exec  # Not in core repos on plain Arch
-    walker-bin          # App launcher (walker)
-    ghostty             # Terminal emulator
-    impala              # TUI wifi manager
-    bluetui             # TUI bluetooth manager
-    satty               # Screenshot annotator
-    wl-screenrec-git    # Screen recorder (GPU-accelerated)
-    wiremix             # TUI audio mixer
+    xdg-terminal-exec   # Not in core repos on plain Arch
+    walker-bin           # App launcher
+    ghostty              # Terminal emulator
+    impala               # TUI wifi manager
+    bluetui              # TUI bluetooth manager
+    wl-screenrec-git     # Screen recorder (GPU-accelerated)
+    wiremix              # TUI audio mixer
+    swayosd              # Already in pacman but AUR may be newer; skip if duplicate
+    gpu-screen-recorder  # GPU-accelerated screen recorder
 )
+
+# ── Optional package groups ───────────────────────────────────────────────────
+ask_install() {
+    local desc="$1"; shift
+    local pkgs=("$@")
+    read -r -p "$(echo -e "\n${YELLOW}Install ${desc}?${RESET} [y/N] ")" resp
+    if [[ "${resp,,}" == "y" ]]; then
+        info "Installing ${desc}…"
+        yay -S --needed --noconfirm "${pkgs[@]}"
+        success "${desc} installed."
+    fi
+}
+
+install_optional_groups() {
+    ask_install "NVIDIA drivers (nvidia-open-dkms)" \
+        nvidia-open-dkms nvidia-utils lib32-nvidia-utils libva-nvidia-driver
+
+    ask_install "Docker & container tools" \
+        docker docker-buildx docker-compose lazydocker
+
+    ask_install "Virtualisation (KVM/QEMU/virt-manager)" \
+        libvirt qemu-desktop qemu-full virt-manager virt-viewer \
+        swtpm freerdp dnsmasq openbsd-netcat
+
+    ask_install "Gaming (Steam/Heroic/Proton via Flatpak)" \
+        flatpak heroic-games-launcher-bin umu
+
+    ask_install "Creative apps (OBS, Blender, GIMP, Inkscape)" \
+        obs-studio blender gimp inkscape
+
+    ask_install "Office & productivity (LibreOffice, Thunderbird)" \
+        libreoffice-fresh thunderbird
+
+    ask_install "Dev editors (Cursor, VS Code)" \
+        cursor-bin cursor-cli
+
+    ask_install "Media & comms (Spotify, Obsidian, qBittorrent)" \
+        spotify obsidian qbittorrent
+}
 
 # pipewire-jack conflicts with jack2 but provides the virtual `jack` package.
 # --noconfirm alone aborts here (defaults to N on conflict), so confirm removal.
@@ -121,10 +172,15 @@ fi
 info "Installing official packages…"
 sudo pacman -S --needed --noconfirm "${PACMAN_PKGS[@]}"
 
+# Remove swayosd from AUR list if it was installed from pacman already
+AUR_PKGS=("${AUR_PKGS[@]/swayosd/}")
+
 info "Installing AUR packages…"
 yay -S --needed --noconfirm "${AUR_PKGS[@]}"
 
 success "Packages installed."
+
+install_optional_groups
 
 # ── 2. ENABLE SYSTEM SERVICES ────────────────────────────────────────────────
 step "Enabling system services"
@@ -132,6 +188,21 @@ step "Enabling system services"
 sudo systemctl enable sddm
 sudo systemctl enable bluetooth
 sudo systemctl enable iwd
+sudo systemctl enable power-profiles-daemon
+sudo systemctl enable ufw
+
+# Enable docker if installed
+if pacman -Q docker &>/dev/null; then
+    sudo systemctl enable docker
+    sudo usermod -aG docker "$USER"
+    info "Added $USER to docker group (re-login needed)"
+fi
+
+# Enable libvirt if installed
+if pacman -Q libvirt &>/dev/null; then
+    sudo systemctl enable libvirtd
+    sudo usermod -aG libvirt "$USER"
+fi
 
 success "Services enabled."
 
@@ -658,8 +729,98 @@ EOF
 chmod +x "$BIN_DIR"/hl-*
 success "Helper scripts written."
 
-# ── 6. HYPRLAND CONFIG ────────────────────────────────────────────────────────
-step "Writing Hyprland config"
+# ── 6. SYS-* COMPATIBILITY STUBS ─────────────────────────────────────────────
+# The dotfiles' hypr/defaults/ reference sys-* commands from the old system
+# scripts dir (~/.local/share/system/bin/). These stubs provide minimal
+# compatible behaviour on a fresh install until the full system dir is set up.
+step "Writing sys-* compatibility stubs"
+
+# sys-toggle-enabled: returns 1 (not enabled) — defaults fire their commands
+cat > "$BIN_DIR/sys-toggle-enabled" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+
+# sys-cmd-present: checks if a command exists
+cat > "$BIN_DIR/sys-cmd-present" <<'EOF'
+#!/usr/bin/env bash
+command -v "$1" &>/dev/null
+EOF
+
+# sys-first-run: no-op on fresh install
+cat > "$BIN_DIR/sys-first-run" <<'EOF'
+#!/usr/bin/env bash
+true
+EOF
+
+# sys-powerprofiles-init: set balanced profile if power-profiles-daemon is running
+cat > "$BIN_DIR/sys-powerprofiles-init" <<'EOF'
+#!/usr/bin/env bash
+powerprofilesctl set balanced 2>/dev/null || true
+EOF
+
+# sys-hyprland-monitor-watch: long-running watcher stub (sleeps until killed)
+cat > "$BIN_DIR/sys-hyprland-monitor-watch" <<'EOF'
+#!/usr/bin/env bash
+sleep infinity
+EOF
+
+# sys-hook: no-op hook runner
+cat > "$BIN_DIR/sys-hook" <<'EOF'
+#!/usr/bin/env bash
+true
+EOF
+
+# system-update: personal update script (mirrors omarchy update pipeline)
+cat > "$BIN_DIR/system-update" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+[[ "${1:-}" != "-y" ]] && read -r -p "Run full system update? [y/N] " r && [[ "${r,,}" != "y" ]] && exit 0
+
+echo "→ Refreshing keyring…"
+sudo pacman -S --noconfirm archlinux-keyring
+
+echo "→ Upgrading system packages…"
+sudo pacman -Syyu --noconfirm
+
+if command -v yay &>/dev/null && curl -s --head https://aur.archlinux.org >/dev/null 2>&1; then
+    echo "→ Upgrading AUR packages…"
+    yay -Sua --noconfirm --cleanafter
+fi
+
+orphans=$(pacman -Qtdq 2>/dev/null) || true
+if [[ -n "$orphans" ]]; then
+    echo "→ Removing orphans: $orphans"
+    sudo pacman -Rns --noconfirm $orphans
+fi
+
+echo "Update complete."
+if pacman -Q linux &>/dev/null && [[ "$(uname -r)" != "$(pacman -Q linux | awk '{print $2}')-$(uname -m)" ]]; then
+    read -r -p "Kernel updated — reboot now? [y/N] " r
+    [[ "${r,,}" == "y" ]] && systemctl reboot --no-wall
+fi
+EOF
+
+chmod +x "$BIN_DIR"/sys-* "$BIN_DIR/system-update"
+success "Sys-* stubs written."
+
+# ── 7. DEPLOY DOTFILES ────────────────────────────────────────────────────────
+step "Deploying dotfiles"
+
+if [[ -f "$SCRIPT_DIR/install" ]]; then
+    info "Running dotfiles install from $SCRIPT_DIR…"
+    bash "$SCRIPT_DIR/install"
+    success "Dotfiles deployed."
+else
+    warn "Dotfiles install script not found at $SCRIPT_DIR/install"
+    warn "Writing minimal fallback configs…"
+    _write_fallback_configs
+fi
+
+# ── FALLBACK CONFIG FUNCTION ──────────────────────────────────────────────────
+# Called only when dotfiles/install is not available. Writes self-contained
+# configs that do not depend on desktop theme infrastructure or sys-* scripts.
+_write_fallback_configs() {
 
 # ── hyprland.conf ─────────────────────────────────────────────────────────────
 cat > "$CFG/hypr/hyprland.conf" <<'EOF'
@@ -1998,49 +2159,71 @@ min_time = 500
 format   = "[$duration](yellow) "
 EOF
 
-# ── 13. WALLPAPER PLACEHOLDER ─────────────────────────────────────────────────
+success "Fallback configs written."
+} # end _write_fallback_configs
+
+# ── 8. WALLPAPER ──────────────────────────────────────────────────────────────
 step "Setting up wallpaper"
 
-if [[ ! -f "$HOME/.local/share/backgrounds/wallpaper" ]]; then
+# The dotfiles install sets up ~/.config/desktop/current/background from
+# ~/.config/desktop/backgrounds/. If that symlink exists, swaybg will use it.
+# We also keep the legacy wallpaper path as a fallback.
+if [[ ! -L "$CFG/desktop/current/background" ]] && \
+   [[ ! -f "$HOME/.local/share/backgrounds/wallpaper" ]]; then
     info "Generating a default dark wallpaper…"
+    mkdir -p "$HOME/.local/share/backgrounds"
     convert -size 3840x2160 \
         gradient:'#0d1117-#1a1f2e' \
         "$HOME/.local/share/backgrounds/wallpaper.png" 2>/dev/null \
     && ln -sf "$HOME/.local/share/backgrounds/wallpaper.png" \
               "$HOME/.local/share/backgrounds/wallpaper" \
-    || warn "ImageMagick not available — wallpaper placeholder skipped. Place an image at ~/.local/share/backgrounds/wallpaper"
+    || warn "ImageMagick unavailable — place an image at ~/.config/desktop/backgrounds/default-dark/"
 fi
 
-# ── 14. SHELL ENVIRONMENT ─────────────────────────────────────────────────────
+# ── 9. SHELL ENVIRONMENT ──────────────────────────────────────────────────────
 step "Configuring shell environment"
 
 SHELL_RC="$HOME/.bashrc"
-[[ -f "$HOME/.zshrc" ]] && SHELL_RC="$HOME/.zshrc"
-
-# Only append if not already present
 append_once() {
     local marker="$1"; local block="$2"
     grep -qF "$marker" "$SHELL_RC" 2>/dev/null || printf '\n%s\n' "$block" >> "$SHELL_RC"
 }
 
-append_once "# hl-desktop PATH" 'export PATH="$HOME/.local/bin:$PATH"'
-append_once "# starship" 'eval "$(starship init bash)"'
-append_once "# zoxide" 'eval "$(zoxide init bash)"'
-append_once "# eza" 'alias ls="eza --icons"'
-append_once "# bat" 'alias cat="bat --plain"'
+# If dotfiles/install ran, it already added the bash/rc source line.
+# These are fallback aliases/evals for the case it didn't.
+append_once 'source ~/.config/bash/rc' \
+    '[[ $- == *i* ]] && source ~/.config/bash/rc'
+append_once '# hl-desktop PATH' \
+    'export PATH="$HOME/.local/bin:$PATH"'
 
 success "Shell environment configured."
 
-# ── 15. UWSM SESSION WRAP ────────────────────────────────────────────────────
+# ── 10. UWSM SESSION WRAP ────────────────────────────────────────────────────
 step "Configuring UWSM"
 
-mkdir -p "$HOME/.config/uwsm/env"
-cat > "$HOME/.config/uwsm/env/hyprland.env" <<'EOF'
-# Extra env vars injected by UWSM for the Hyprland session
-XDG_SESSION_TYPE=wayland
-XDG_CURRENT_DESKTOP=Hyprland
-XDG_SESSION_DESKTOP=Hyprland
-EOF
+mkdir -p "$CFG/uwsm"
+
+# Write env as a FILE (not a directory) — sourced by uwsm at session start
+if [[ ! -f "$CFG/uwsm/env" ]]; then
+    cat > "$CFG/uwsm/env" <<'UWSMENV'
+# Changes require a restart to take effect.
+
+# Ensure user bins are in the path
+export PATH=$HOME/.local/bin:$PATH
+
+# Set default terminal and editor
+source ~/.config/uwsm/default
+UWSMENV
+fi
+
+if [[ ! -f "$CFG/uwsm/default" ]]; then
+    cat > "$CFG/uwsm/default" <<'UWSMDEFAULT'
+export TERMINAL=xdg-terminal-exec
+export EDITOR=nvim
+export SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
+export SCREENRECORD_DIR="$HOME/Videos/Screencasts"
+UWSMDEFAULT
+fi
 
 success "UWSM configured."
 
@@ -2052,13 +2235,14 @@ echo -e "╚══════════════════════�
 echo ""
 echo -e "${BOLD}Next steps:${RESET}"
 echo "  1. Adjust monitor config:   $CFG/hypr/monitors.conf"
-echo "  2. Set your wallpaper:      cp your-image ~/.local/share/backgrounds/wallpaper"
-echo "  3. Verify SDDM theme:       sudo systemctl start sddm   (or reboot)"
-echo "  4. NVIDIA users:            Add env vars to $CFG/hypr/envs.conf"
-echo "     env = NVD_BACKEND,direct"
-echo "     env = LIBVA_DRIVER_NAME,nvidia"
-echo "     env = __GLX_VENDOR_LIBRARY_NAME,nvidia"
+echo "  2. Add wallpapers:          cp your-images ~/.config/desktop/backgrounds/default-dark/"
+echo "  3. Reboot to start SDDM:    sudo systemctl reboot"
+echo "  4. NVIDIA users:            Ensure $CFG/hypr/envs.conf has:"
+echo "       env = NVD_BACKEND,direct"
+echo "       env = LIBVA_DRIVER_NAME,nvidia"
+echo "       env = __GLX_VENDOR_LIBRARY_NAME,nvidia"
 echo ""
-echo -e "${BLUE}All helper scripts are in:${RESET} $BIN_DIR (hl-* prefix)"
-echo -e "${BLUE}Config files are in:${RESET}       $CFG/hypr/"
+echo -e "${BLUE}Helper scripts:${RESET}  $BIN_DIR/hl-*  (desktop controls)"
+echo -e "${BLUE}Sys-* stubs:${RESET}    $BIN_DIR/sys-* (compatibility, replace later)"
+echo -e "${BLUE}Update script:${RESET}  system-update"
 echo ""

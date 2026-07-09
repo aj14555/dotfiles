@@ -34,7 +34,7 @@
 
   "custom/menu": {
     "format": "",
-    "on-click": "omarchy-menu",
+    "on-click": "sys-menu",
     "on-click-right": "xdg-terminal-exec",
     "tooltip-format": "Launcher Menu\n\nSuper + Alt + Space"
   },
@@ -67,7 +67,7 @@
     "format": " {:L%A %H:%M}",
     "format-alt": " {:L%d %B W%V %Y}",
     "tooltip": false,
-    "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
+    "on-click-right": "sys-launch-floating-terminal-with-presentation sys-tz-select"
   },
 
   // ── Center ────────────────────────────────────────────────────────────────
@@ -90,13 +90,13 @@
   "custom/update": {
     "format": "",
     "exec": "check-updates",
-    "on-click": "omarchy-launch-floating-terminal-with-presentation system-update",
+    "on-click": "sys-launch-floating-terminal-with-presentation system-update",
     "tooltip-format": "System update available",
     "signal": 7,
     "interval": 21600
   },
   "custom/voxtype": {
-    "exec": "omarchy-voxtype-status",
+    "exec": "sys-voxtype-status",
     "return-type": "json",
     "format": "{icon}",
     "format-icons": {
@@ -105,23 +105,23 @@
       "transcribing": "󰔟"
     },
     "tooltip": true,
-    "on-click-right": "omarchy-voxtype-config",
-    "on-click": "omarchy-voxtype-model"
+    "on-click-right": "sys-voxtype-config",
+    "on-click": "sys-voxtype-model"
   },
   "custom/screenrecording-indicator": {
-    "on-click": "omarchy-capture-screenrecording",
+    "on-click": "sys-capture-screenrecording",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/screen-recording.sh",
     "signal": 8,
     "return-type": "json"
   },
   "custom/idle-indicator": {
-    "on-click": "omarchy-toggle-idle",
+    "on-click": "sys-toggle-idle",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/idle.sh",
     "signal": 9,
     "return-type": "json"
   },
   "custom/notification-silencing-indicator": {
-    "on-click": "omarchy-toggle-notification-silencing",
+    "on-click": "sys-toggle-notification-silencing",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/notification-silencing.sh",
     "signal": 10,
     "return-type": "json"
@@ -156,7 +156,7 @@
     "format-connected": "󰂱",
     "format-no-controller": "",
     "tooltip-format": "Devices connected: {num_connections}",
-    "on-click": "omarchy-launch-bluetooth"
+    "on-click": "sys-launch-bluetooth"
   },
   "network": {
     "format-icons": [""],
@@ -169,11 +169,11 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "omarchy-launch-wifi"
+    "on-click": "sys-launch-wifi"
   },
   "pulseaudio": {
     "format": "{icon}",
-    "on-click": "omarchy-launch-audio",
+    "on-click": "sys-launch-audio",
     "on-click-right": "pamixer -t",
     "tooltip-format": "{volume}%",
     "scroll-step": 5,
@@ -187,7 +187,7 @@
   "cpu": {
     "interval": 5,
     "format": "",
-    "on-click": "omarchy-launch-or-focus-tui btop",
+    "on-click": "sys-launch-or-focus-tui btop",
     "on-click-right": "alacritty"
   },
   "battery": {
@@ -203,8 +203,8 @@
     "tooltip-format-discharging": "{power:>1.0f}W↓ {capacity}%",
     "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
     "interval": 5,
-    "on-click": "omarchy-menu power",
-    "on-click-right": "notify-send -u low \"$(omarchy-battery-status)\"",
+    "on-click": "sys-menu power",
+    "on-click-right": "notify-send -u low \"$(sys-battery-status)\"",
     "states": {
       "warning": 20,
       "critical": 10
