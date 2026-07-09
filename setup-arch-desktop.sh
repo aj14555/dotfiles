@@ -68,7 +68,7 @@ PACMAN_PKGS=(
 
     # Screenshot / screen capture
     grim slurp wl-clipboard hyprland-guiutils
-    tesseract tesseract-data-eng imagemagick satty
+    tesseract tesseract-data-eng imagemagick
 
     # Network
     iwd
@@ -81,7 +81,7 @@ PACMAN_PKGS=(
 
     # GTK / GNOME utilities
     nautilus gvfs gvfs-mtp gvfs-smb gnome-disk-utility
-    gnome-calculator gnome-themes-extra yaru-icon-theme
+    gnome-calculator gnome-themes-extra
 
     # System monitor / TUI tools
     btop lazygit tmux fzf bat eza zoxide fastfetch starship
@@ -117,10 +117,11 @@ AUR_PKGS=(
     ghostty              # Terminal emulator
     impala               # TUI wifi manager
     bluetui              # TUI bluetooth manager
+    satty                # Screenshot annotator (AUR on some setups)
     wl-screenrec-git     # Screen recorder (GPU-accelerated)
     wiremix              # TUI audio mixer
-    swayosd              # Already in pacman but AUR may be newer; skip if duplicate
     gpu-screen-recorder  # GPU-accelerated screen recorder
+    yaru-icon-theme      # Icon theme (AUR on Arch)
 )
 
 # ── Optional package groups ───────────────────────────────────────────────────
@@ -162,11 +163,11 @@ install_optional_groups() {
         spotify obsidian qbittorrent
 }
 
-# pipewire-jack conflicts with jack2 but provides the virtual `jack` package.
-# --noconfirm alone aborts here (defaults to N on conflict), so confirm removal.
-if pacman -Q jack2 &>/dev/null && ! pacman -Q pipewire-jack &>/dev/null; then
-    info "Replacing jack2 with pipewire-jack…"
-    printf 'y\n' | sudo pacman -S --needed --noconfirm pipewire-jack
+# pipewire-jack conflicts with jack2. Remove jack2 first if present so the
+# main pacman install doesn't abort on the conflict prompt.
+if pacman -Q jack2 &>/dev/null; then
+    info "Removing conflicting jack2 (replaced by pipewire-jack)…"
+    sudo pacman -Rdd --noconfirm jack2
 fi
 
 info "Installing official packages…"
