@@ -95,7 +95,7 @@ PACMAN_PKGS=(
     cliphist
 
     # Shell / utilities
-    jq gum wget unzip less bash-completion
+    jq gum wget unzip less bash-completion rsync
     woff2-font-awesome git github-cli
 
     # Media
@@ -215,7 +215,8 @@ sudo tee /usr/share/wayland-sessions/hyprland-uwsm.desktop > /dev/null <<'EOF'
 [Desktop Entry]
 Name=Hyprland (UWSM)
 Comment=Hyprland via UWSM session manager
-Exec=uwsm start -S hyprland-uwsm.desktop
+Exec=uwsm start -- Hyprland
+DesktopNames=Hyprland
 Type=Application
 EOF
 

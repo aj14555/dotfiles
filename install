@@ -167,6 +167,9 @@ mkdir -p \
     "$HOME/.local/state/desktop/toggles/hypr" \
     "$HOME/.local/state/hl"
 
+# Hyprland's glob source= fails if the toggles dir is empty — keep a no-op placeholder
+touch "$HOME/.local/state/desktop/toggles/hypr/.keep.conf"
+
 # ── UWSM config files ──────────────────────────────────────────────────────
 UWSM_DIR="$CONFIG/uwsm"
 mkdir -p "$UWSM_DIR"
