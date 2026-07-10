@@ -20,6 +20,29 @@ show_about() {
       "uwsm-app -- xdg-terminal-exec --app-id=org.omarchy.about -e bash -c 'while [ \"\$(tput cols 2>/dev/null || echo 0)\" -lt 120 ]; do sleep 0.05; done; fastfetch; read -n 1 -s'"
 }
 
+show_main_menu() {
+  go_to_menu "$(menu "Go" "󰀻  Apps\n󱓞  Trigger\n  Style\n  Setup\n󰉉  Install\n󰭌  Remove\n  Update\n  System")"
+}
+
+show_install_menu() {
+  case $(menu "Install" "󰣇  Package\n󰣇  AUR\n  Web App\n  TUI") in
+  *Package*) terminal sys-pkg-install ;;
+  *AUR*) terminal sys-pkg-aur-install ;;
+  *Web*) present_terminal sys-webapp-install ;;
+  *TUI*) present_terminal sys-tui-install ;;
+  *) show_main_menu ;;
+  esac
+}
+
+show_remove_menu() {
+  case $(menu "Remove" "󰣇  Package\n  Web App\n  TUI") in
+  *Package*) terminal sys-pkg-remove ;;
+  *Web*) present_terminal sys-webapp-remove ;;
+  *TUI*) present_terminal sys-tui-remove ;;
+  *) show_main_menu ;;
+  esac
+}
+
 # ── Icon spacing fix ──────────────────────────────────────────────────────────
 # Override menu() to replace the double-space between icon glyph and label with
 # an em space (U+2003, 1em wide) for display only. The return value is cleaned
